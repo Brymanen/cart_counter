@@ -2,12 +2,12 @@ local sdk = sdk
 local log = log
 local imgui = imgui
 local re = re
-local json = json
+local json = json  -- REFramework provides this globally
 
 local cart_data_path = "cart_counter.json"
 
 local cart_count = 0
-local session_cart_count = 0
+local session_cart_count = 0  -- Session-specific counter
 
 -- Load persistent cart count from file
 local function load_cart_count()
@@ -46,11 +46,24 @@ sdk.hook(
     nil
 )
 
--- Draw UI to show cart stats
+-- Draw UI to show and reset cart stats
 re.on_draw_ui(function()
     if imgui.tree_node("Cart Counter") then
         imgui.text("Total Carts: " .. tostring(cart_count))
+        imgui.same_line()
+        if imgui.button("Reset Total") then
+            cart_count = 0
+            save_cart_count()
+            log.info("[CART MOD] Total cart count reset.")
+        end
+
         imgui.text("Carts This Session: " .. tostring(session_cart_count))
+        imgui.same_line()
+        if imgui.button("Reset Session") then
+            session_cart_count = 0
+            log.info("[CART MOD] Session cart count reset.")
+        end
+
         imgui.tree_pop()
     end
 end)
